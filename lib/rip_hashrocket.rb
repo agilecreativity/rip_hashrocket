@@ -2,7 +2,7 @@ require "rip_hashrocket/version"
 
 module RipHashrocket
   def self.process(options)
-  
+
     directory = options[0] || Dir.pwd
     backup = options[1] || false
 
@@ -11,7 +11,7 @@ module RipHashrocket
     rbfiles = File.join(directory ,"**", "*.rb")
     Dir.glob(rbfiles).each do |filename|
       file = File.new(filename, "r+")
-      
+
       made_changes = false
       lines = file.readlines
 
@@ -21,11 +21,11 @@ module RipHashrocket
           #puts "line: #{lines[i]}"
           #puts "newline: #{newline}"
           lines[i] = newline
-          made_changes = true 
+          made_changes = true
           linecount += 1
         end
       end
-  
+
       file.close
       if made_changes
         filecount += 1
@@ -40,16 +40,30 @@ module RipHashrocket
 	      file.close
       end
     end
-    p "Hash Rockets has upgraded hash syntax on #{linecount} lines in #{filecount} out of #{Dir.glob(rbfiles).count} source files tested"    
+    p "Hash Rockets has upgraded hash syntax on #{linecount} lines in #{filecount} out of #{Dir.glob(rbfiles).count} source files tested"
   end
 
 end
 
 class String
+
+  # def replace_rockets(s)
+  #   s.gsub(/:([0-9a-z_\-.]*)(\s{0,})=>(\s{0,})/) do |n|
+  #     #puts "n: #{n}"
+  #     n.include?('-') ? n : "#{$1}:#{$2!=' '?$2:''}#{$3}"
+  #   end
+  # end
+
+  # Reformat hash rocket to add one space between key and value
+  # for input like ":key=>:value" as this will result in "key::value"
   def replace_rockets(s)
-    s.gsub(/:([0-9a-z_\-.]*)(\s{0,})=>(\s{0,})/) do |n|
-      #puts "n: #{n}"
-      n.include?('-') ? n : "#{$1}:#{$2!=' '?$2:''}#{$3}" 
+    s.gsub(/:([0-9a-z_.]*)(\s{0,})=>(\s{0,})/) do |n|
+      if $2.empty?
+        "#{$1}: #{$3}"
+      else
+        "#{$1}:#{$3}"
+      end
     end
   end
+
 end
